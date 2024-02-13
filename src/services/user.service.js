@@ -12,6 +12,14 @@ const findUserById = async (id) => {
     return data;
 }
 
+const findAndUpdateUser = async (id, updateData) => {
+    const data = await User.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }).select("-password -refreshToken");
+    return data;
+}
+
 const createUser = async (userData) => {
     const data = await User.create(userData);
     return data;
@@ -20,5 +28,6 @@ const createUser = async (userData) => {
 export {
     createUser,
     findUser,
-    findUserById
+    findUserById,
+    findAndUpdateUser
 }

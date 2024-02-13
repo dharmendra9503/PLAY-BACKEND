@@ -5,7 +5,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import {
     createUser,
     findUser,
-    findUserById
+    findUserById,
+    findAndUpdateUser
 } from "../services/user.service.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -134,7 +135,28 @@ const loginUser = asyncHandler(async (req, res) => {
         );
 })
 
+const logoutUser = asyncHandler(async (req, res) => {
+    // remove refresh token from db
+    await findAndUpdateUser(
+        req.user._id,
+        { $unset: { refreshToken: 1 /* this removes the field from document */ } }
+    );
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    // clear cookies from response object and send response to client with message
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new ApiResponse(200, {}, "User logged Out"));
+})
+
 export {
     registerUser,
-    loginUser
+    loginUser,
+    logoutUser
 }
