@@ -7,9 +7,14 @@ const findUser = async (username, email) => {
     return data;
 }
 
-const findUserById = async (id) => {
-    const data = await User.findById(id).select("-password -refreshToken");
-    return data;
+const findUserById = async (id, refreshToken = false) => {
+    if (!refreshToken) {
+        const data = await User.findById(id).select("-password -refreshToken");
+        return data;
+    } else {
+        const data = await User.findById(id).select("-password");
+        return data;
+    }
 }
 
 const findAndUpdateUser = async (id, updateData) => {
