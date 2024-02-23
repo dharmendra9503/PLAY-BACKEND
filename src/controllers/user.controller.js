@@ -209,9 +209,125 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 })
 
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        // check if old password is correct
+        const user = await findUserById(req.user?._id);
+        const isPasswordValid = await user.isPasswordCorrect(oldPassword);
+        if (!isPasswordValid) {
+            throw new ApiError(401, "Invalid old password");
+        }
+        // update password
+        user.password = newPassword;
+        await user.save({ validateBeforeSave: false  /* this will not validate the document before saving */ });
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, {}, "Password changed successfully"));
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while changing password");
+    }
+})
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+    return res
+        .status(200)
+        .json(new ApiResponse(200, req.user, "User details fetched successfully"));
+})
+
+const updateAccountDetails = asyncHandler(async (req, res) => {
+    try {
+        // get user details from request
+        const { fullName, email } = req.body;
+        if (!fullName || !email) {
+            throw new ApiError(400, "All fields are required");
+        }
+        // update user details in db
+        const user = await findAndUpdateUser(
+            req.user._id,
+            {
+                $set: {
+                    fullName,
+                    email
+                }
+            },
+            true // this will return updated document with refresh token
+        );
+        return res
+            .status(200)
+            .json(new ApiResponse(200, user, "Account details updated successfully"));
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while updating account details");
+    }
+})
+
+const updateUserAvatar = asyncHandler(async (req, res) => {
+    try {
+        // check for avatar file in request object - req.file or req.files
+        const avatarLocalPath = req.file?.path;
+        if (!avatarLocalPath) {
+            throw new ApiError(400, "Avatar file is required");
+        }
+        // upload avatar to cloudinary
+        const avatar = await uploadOnCloudinary(avatarLocalPath);
+        if (!avatar.url) {
+            throw new ApiError(400, "Error while uploading avatar on cloudinary");
+        }
+        const user = await findAndUpdateUser(
+            req.user?._id,
+            {
+                $set: {
+                    avatar: avatar.url
+                }
+            },
+            true // this will return updated document with refresh token
+        );
+        return res
+            .status(200)
+            .json(new ApiResponse(200, user, "Avatar updated successfully"));
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while updating avatar");
+    }
+})
+
+const updateUserCoverImage = asyncHandler(async (req, res) => {
+    try {
+        // check for cover image file in request object - req.file or req.files
+        const coverImageLocalPath = req.file?.path;
+        if (!coverImageLocalPath) {
+            throw new ApiError(400, "Cover image file is required");
+        }
+        // upload cover image to cloudinary
+        const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+        if (!coverImage.url) {
+            throw new ApiError(400, "Error while uploading cover image on cloudinary");
+        }
+        const user = await findAndUpdateUser(
+            req.user?._id,
+            {
+                $set: {
+                    coverImage: coverImage.url
+                }
+            },
+            true // this will return updated document with refresh token
+        );
+        return res
+            .status(200)
+            .json(new ApiResponse(200, user, "Cover image updated successfully"));
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while updating cover image");
+    }
+})
+
 export {
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    changeCurrentPassword,
+    getCurrentUser,
+    updateAccountDetails,
+    updateUserAvatar,
+    updateUserCoverImage
 }

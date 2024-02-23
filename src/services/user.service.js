@@ -17,12 +17,20 @@ const findUserById = async (id, refreshToken = false) => {
     }
 }
 
-const findAndUpdateUser = async (id, updateData) => {
-    const data = await User.findByIdAndUpdate(
-        id,
-        updateData,
-        { new: true }).select("-password -refreshToken");
-    return data;
+const findAndUpdateUser = async (id, updateData, refreshToken = false) => {
+    if (!refreshToken) {
+        const data = await User.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true }).select("-password -refreshToken");
+        return data;
+    } else {
+        const data = await User.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true }).select("-password");
+        return data;
+    }
 }
 
 const createUser = async (userData) => {
