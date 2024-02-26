@@ -38,9 +38,72 @@ const createUser = async (userData) => {
     return data;
 }
 
+const findUserChannelProfile = async (username, id) => {
+    const data = await User.aggregate([
+        {
+            $match: {
+                username: username?.toLowerCase()
+            }
+        },
+        {
+            // this will find total subscribers count for the channel
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "channel",
+                as: "subscribers"
+            }
+        },
+        {
+            // this will find total channels subscribed by the user
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "subscriber",
+                as: "subscribedTo"
+            }
+        },
+        {
+            /*
+             * this will find total subscribers count for the channel and total channels subscribed by the user 
+             * and also check if the user is subscribed to the channel or not
+             */
+            $addFields: {
+                subscribersCount: {
+                    $size: "$subscribers"
+                },
+                channelsSubscribedToCount: {
+                    $size: "$subscribedTo"
+                },
+                isSubscribed: {
+                    $cond: {
+                        if: { $in: [id, "$subscribers.subscriber"] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                fullName: 1,
+                username: 1,
+                subscribersCount: 1,
+                channelsSubscribedToCount: 1,
+                isSubscribed: 1,
+                avatar: 1,
+                coverImage: 1,
+                email: 1
+            }
+        }
+    ]);
+    return data;
+}
+
 export {
     createUser,
     findUser,
     findUserById,
-    findAndUpdateUser
+    findAndUpdateUser,
+    findUserChannelProfile
 }

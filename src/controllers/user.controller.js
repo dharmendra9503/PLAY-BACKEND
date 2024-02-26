@@ -7,7 +7,8 @@ import {
     createUser,
     findUser,
     findUserById,
-    findAndUpdateUser
+    findAndUpdateUser,
+    findUserChannelProfile
 } from "../services/user.service.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -29,7 +30,7 @@ const registerUser = asyncHandler(async (req, res) => {
     try {
         // get user details from request
         const { fullName, username, email, password } = req.body;
-    
+
         // validation - not empty
         if (
             !fullName || !username || !email || !password ||
@@ -37,13 +38,13 @@ const registerUser = asyncHandler(async (req, res) => {
         ) {
             throw new ApiError(400, "All fields are required");
         }
-    
+
         // check if user already exists: username, email
         const existedUser = await findUser(username, email);
         if (existedUser) {
             throw new ApiError(409, "User with email or username already exists");
         }
-    
+
         // check for images, check for avatar
         // console.log(req.files);
         let avatarLocalPath;
@@ -57,15 +58,15 @@ const registerUser = asyncHandler(async (req, res) => {
         if (!avatarLocalPath) {
             throw new ApiError(400, "Avatar image is required");
         }
-    
+
         // upload image to cloudinary, avatar
         const avatar = await uploadOnCloudinary(avatarLocalPath);
         const coverImage = await uploadOnCloudinary(coverImageLocalPath);
-    
+
         if (!avatar) {
             throw new ApiError(400, "Avatar file is required");
         }
-    
+
         // create user object - create entry in db
         const userData = {
             fullName,
@@ -76,15 +77,15 @@ const registerUser = asyncHandler(async (req, res) => {
             username: username.toLowerCase()
         };
         const user = await createUser(userData);
-    
+
         // remove password and refresh token field from response
         const createdUser = await findUserById(user._id);
-    
+
         // check for user creation
         if (!createdUser) {
             throw new ApiError(500, "Something went wrong while registering the user");
         }
-    
+
         // return res
         return res
             .status(201)
@@ -98,35 +99,35 @@ const loginUser = asyncHandler(async (req, res) => {
     try {
         // get user details from request
         const { email, username, password } = req.body;
-    
+
         // validation - not empty
         if (!username && !email) {
             throw new ApiError(400, "Username or email is required");
         }
-    
+
         // check if user exists email
         const user = await findUser(username, email);
         if (!user) {
             throw new ApiError(404, "User does not exist");
         }
-    
+
         // check if password is correct
         const isPasswordValid = await user.isPasswordCorrect(password);
         if (!isPasswordValid) {
             throw new ApiError(401, "Invalid user credentials");
         }
-    
+
         // generate access token and refresh token
         const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
-    
+
         const loggedInUser = await findUserById(user._id);
-    
+
         //This option will set the cookie as secure and httpOnly, so the cookie cannot be accessed by client-side scripts
         const options = {
             httpOnly: true,
             secure: true
         };
-    
+
         return res
             .status(200)
             .cookie("accessToken", accessToken, options)
@@ -152,12 +153,12 @@ const logoutUser = asyncHandler(async (req, res) => {
             req.user._id,
             { $unset: { refreshToken: 1 /* this removes the field from document */ } }
         );
-    
+
         const options = {
             httpOnly: true,
             secure: true
         }
-    
+
         // clear cookies from response object and send response to client with message
         return res
             .status(200)
@@ -336,6 +337,27 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     }
 })
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+    try {
+        const { username } = req.params;
+        if (!username?.trim()) {
+            throw new ApiError(400, "Username is required");
+        }
+        const channel = await findUserChannelProfile(username, req.user?._id);
+        if (!channel?.length) {
+            throw new ApiError(404, "channel does not exists");
+        }
+        console.log(channel);
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(200, channel[0], "User channel fetched successfully")
+            );
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while fetching user details", error);
+    }
+})
+
 export {
     registerUser,
     loginUser,
@@ -345,5 +367,6 @@ export {
     getCurrentUser,
     updateAccountDetails,
     updateUserAvatar,
-    updateUserCoverImage
+    updateUserCoverImage,
+    getUserChannelProfile
 }
