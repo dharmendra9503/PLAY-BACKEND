@@ -100,10 +100,56 @@ const findUserChannelProfile = async (username, id) => {
     return data;
 }
 
+const findUserWatchHistory = async (id) => {
+    const data = await User.aggregate([
+        {
+            $match: {
+                _id: id
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            owner: {
+                                $first: "$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]);
+    return data;
+}
+
 export {
     createUser,
     findUser,
     findUserById,
     findAndUpdateUser,
-    findUserChannelProfile
+    findUserChannelProfile,
+    findUserWatchHistory
 }

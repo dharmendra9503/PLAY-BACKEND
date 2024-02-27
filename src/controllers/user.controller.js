@@ -8,7 +8,8 @@ import {
     findUser,
     findUserById,
     findAndUpdateUser,
-    findUserChannelProfile
+    findUserChannelProfile,
+    findUserWatchHistory
 } from "../services/user.service.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -22,7 +23,7 @@ const generateAccessAndRefereshTokens = async (userId) => {
 
         return { accessToken, refreshToken };
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while generating access token and refresh token", error);
+        throw new ApiError(500, "Something went wrong while generating access token and refresh token");
     }
 }
 
@@ -91,7 +92,7 @@ const registerUser = asyncHandler(async (req, res) => {
             .status(201)
             .json(new ApiResponse(200, createdUser, "User registered Successfully"));
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while registering the user", error);
+        throw new ApiError(error?.statusCode || 500, error?.message || "Something went wrong while registering the user");
     }
 })
 
@@ -142,7 +143,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 )
             );
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while logging in the user", error);
+        throw new ApiError(error?.statusCode || 500, error?.message || "Something went wrong while logging in the user");
     }
 })
 
@@ -166,7 +167,7 @@ const logoutUser = asyncHandler(async (req, res) => {
             .clearCookie("refreshToken", options)
             .json(new ApiResponse(200, {}, "User logged Out"));
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while logging out the user", error);
+        throw new ApiError(500, "Something went wrong while logging out the user");
     }
 })
 
@@ -219,7 +220,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
                 )
             );
     } catch (error) {
-        throw new ApiError(401, error?.message || "Invalid refresh token");
+        throw new ApiError(error?.statusCode || 500, error?.message || "Something went wrong while refreshing access token");
     }
 })
 
@@ -243,7 +244,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
             .status(200)
             .json(new ApiResponse(200, {}, "Password changed successfully"));
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while changing password", error);
+        throw new ApiError(error?.statusCode || 500, error?.message || "Something went wrong while changing password");
     }
 })
 
@@ -275,7 +276,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
             .status(200)
             .json(new ApiResponse(200, user, "Account details updated successfully"));
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while updating account details", error);
+        throw new ApiError(error?.statusCode || 500, error?.message || "Something went wrong while updating account details");
     }
 })
 
@@ -304,7 +305,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
             .status(200)
             .json(new ApiResponse(200, user, "Avatar updated successfully"));
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while updating avatar", error);
+        throw new ApiError(error?.statusCode || 500, error?.message || "Something went wrong while updating avatar");
     }
 })
 
@@ -333,7 +334,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
             .status(200)
             .json(new ApiResponse(200, user, "Cover image updated successfully"));
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while updating cover image", error);
+        throw new ApiError(error?.statusCode || 500, error?.message || "Something went wrong while updating cover image");
     }
 })
 
@@ -354,7 +355,24 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 new ApiResponse(200, channel[0], "User channel fetched successfully")
             );
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while fetching user details", error);
+        throw new ApiError(error?.statusCode || 500, error?.message || "Something went wrong while fetching user details");
+    }
+})
+
+const getWatchHistory = asyncHandler(async (req, res) => {
+    try {
+        const user = await findUserWatchHistory(req.user?._id);
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    user[0].watchHistory,
+                    "Watch history fetched successfully"
+                )
+            );
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while fetching watch history");
     }
 })
 
@@ -368,5 +386,6 @@ export {
     updateAccountDetails,
     updateUserAvatar,
     updateUserCoverImage,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getWatchHistory
 }
