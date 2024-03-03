@@ -50,19 +50,19 @@ const registerUser = asyncHandler(async (req, res) => {
         // console.log(req.files);
         let avatarLocalPath;
         if (req.files && Array.isArray(req.files.avatar) && req.files.avatar.length > 0) {
-            avatarLocalPath = req.files?.avatar[0]?.path;
+            avatarLocalPath = req.files?.avatar[0];
         }
         let coverImageLocalPath;
         if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
-            coverImageLocalPath = req.files.coverImage[0].path;
+            coverImageLocalPath = req.files.coverImage[0];
         }
         if (!avatarLocalPath) {
             throw new ApiError(400, "Avatar image is required");
         }
 
         // upload image to cloudinary, avatar
-        const avatar = await uploadOnCloudinary(avatarLocalPath);
-        const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+        const avatar = await uploadOnCloudinary(avatarLocalPath?.path, avatarLocalPath?.fieldname);
+        const coverImage = await uploadOnCloudinary(coverImageLocalPath?.path, coverImageLocalPath?.fieldname);
 
         if (!avatar) {
             throw new ApiError(400, "Avatar file is required");
@@ -71,8 +71,8 @@ const registerUser = asyncHandler(async (req, res) => {
         // create user object - create entry in db
         const userData = {
             fullName,
-            avatar: avatar.url,
-            coverImage: coverImage?.url || "",
+            avatar: avatar.secure_url,
+            coverImage: coverImage?.secure_url || "",
             email,
             password,
             username: username.toLowerCase()
@@ -288,15 +288,15 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
             throw new ApiError(400, "Avatar file is required");
         }
         // upload avatar to cloudinary
-        const avatar = await uploadOnCloudinary(avatarLocalPath);
-        if (!avatar.url) {
+        const avatar = await uploadOnCloudinary(avatarLocalPath, req.file?.fieldname);
+        if (!avatar.secure_url) {
             throw new ApiError(400, "Error while uploading avatar on cloudinary");
         }
         const user = await findAndUpdateUser(
             req.user?._id,
             {
                 $set: {
-                    avatar: avatar.url
+                    avatar: avatar.secure_url
                 }
             },
             true // this will return updated document with refresh token
@@ -317,7 +317,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
             throw new ApiError(400, "Cover image file is required");
         }
         // upload cover image to cloudinary
-        const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+        const coverImage = await uploadOnCloudinary(coverImageLocalPath, req.file?.fieldname);
         if (!coverImage.url) {
             throw new ApiError(400, "Error while uploading cover image on cloudinary");
         }
@@ -325,7 +325,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
             req.user?._id,
             {
                 $set: {
-                    coverImage: coverImage.url
+                    coverImage: coverImage.secure_url
                 }
             },
             true // this will return updated document with refresh token

@@ -19,26 +19,32 @@ const publishAVideo = asyncHandler(async (req, res) => {
         }
 
         //Check if videoFile and thumbnail are uploaded and are valid files
-        if (!req.files || !req.files?.videoFile || !req.files?.thumbnail) {
+        if (!req.files || !req.files?.video || !req.files?.thumbnail) {
             throw new ApiError(400, "Video file and thumbnail are required")
         }
-        // console.log(req.files.videoFile[0], req.files.thumbnail[0]);
+        // console.log(req.files.video[0], req.files.thumbnail[0]);
+        if (req.files.video[0]?.mimetype?.split('/')[0] !== 'video') {
+            throw new ApiError(400, "Invalid video file")
+        }
+        if (req.files.thumbnail[0]?.mimetype?.split('/')[0] !== 'image') {
+            throw new ApiError(400, "Invalid thumbnail file")
+        }
 
         //Upload videoFile and thumbnail to cloudinary
-        const videoFileLocal = req.files.videoFile[0]?.path;
-        const thumbnailLocal = req.files.thumbnail[0]?.path;
-        const videoFileCloudinaryUrl = await uploadOnCloudinary(videoFileLocal);
-        const thumbnailCloudinaryUrl = await uploadOnCloudinary(thumbnailLocal);
+        const videoFileLocal = req.files.video[0];
+        const thumbnailLocal = req.files.thumbnail[0];
+        const videoFileCloudinaryUrl = await uploadOnCloudinary(videoFileLocal?.path, videoFileLocal?.fieldname);
+        const thumbnailCloudinaryUrl = await uploadOnCloudinary(thumbnailLocal?.path, thumbnailLocal?.fieldname);
         // console.log(videoFileCloudinaryUrl, thumbnailCloudinaryUrl);
 
         if (!videoFileCloudinaryUrl || !thumbnailCloudinaryUrl) {
             throw new ApiError(500, "Failed to upload video file or thumbnail")
         }
 
-        //TODO: save video details to database
+        //save video details to database
         const videoDetails = {
-            videoFile: videoFileCloudinaryUrl?.url,
-            thumbnail: thumbnailCloudinaryUrl?.url,
+            videoFile: videoFileCloudinaryUrl?.secure_url,
+            thumbnail: thumbnailCloudinaryUrl?.secure_url,
             title,
             description,
             duration: videoFileCloudinaryUrl?.duration,
