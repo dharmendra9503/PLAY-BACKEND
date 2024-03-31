@@ -6,6 +6,12 @@ const publishVideoService = async (videoDetails) => {
     return savedVideo;
 }
 
+const findVideoById = async (videoId) => {
+    const video = await Video.find({ _id: videoId, isPublished: true }).select("-__v");
+    return video;
+}
+
 export {
-    publishVideoService
+    publishVideoService,
+    findVideoById
 }

@@ -3,6 +3,9 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { publishVideoService } from "../services/video.service.js";
+import { findVideoById } from "../services/video.service.js";
+import { v2 as cloudinary } from 'cloudinary';
+import axios from 'axios';
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
@@ -65,8 +68,41 @@ const publishAVideo = asyncHandler(async (req, res) => {
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    //TODO: get video by id
+    const { videoId } = req.params;
+    // const videoObjectId = new mongoose.Types.ObjectId(videoId);
+
+    //get video details by videoId from database if video is published
+    // const video = await findVideoById(videoId);
+    // if (!video) {
+    //     throw new ApiError(404, "Video not found")
+    // }
+    // console.log(video);
+
+    // Generate the secure, signed URL
+    const videoUrl = cloudinary.url(`video/${videoId}`, {
+        resource_type: 'video',
+        secure: true,
+        sign_url: true,
+        type: 'upload',
+        streaming_profile: 'full_hd',
+        format: 'm3u8' // HLS format for streaming
+    });
+
+    // Set headers to prevent direct downloading and caching
+    res.set({
+        'Content-Type': 'application/x-mpegURL', // HLS content type
+        'Cache-Control': 'no-store',
+        'Content-Security-Policy': "default-src 'self'; script-src 'none'; sandbox;",
+    });
+
+    // Stream the video content through your server to the client
+    try {
+        const response = await axios.get(videoUrl, { responseType: 'stream' });
+        response.data.pipe(res);
+    } catch (error) {
+        console.error('Error streaming video:', error);
+        res.sendStatus(500);
+    }
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
