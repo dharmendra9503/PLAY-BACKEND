@@ -2,14 +2,29 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import { publishVideoService } from "../services/video.service.js";
+import { publishVideoService, findAllVideos } from "../services/video.service.js";
 import { findVideoById } from "../services/video.service.js";
-import { v2 as cloudinary } from 'cloudinary';
 import axios from 'axios';
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
     //TODO: get all videos based on query, sort, pagination
+    let options = {};
+    if (userId) {
+        options['userId'] = userId;
+    }
+    if (query) {
+        options['query'] = query;
+    }
+    if (sortBy) {
+        options['sortBy'] = sortBy;
+    }
+    if (sortType) {
+        options['sortType'] = sortType;
+    }
+    const videos = await findAllVideos(page, limit, options);
+
+    return res.status(200).json(new ApiResponse(200, videos, "Videos fetched successfully"));
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
