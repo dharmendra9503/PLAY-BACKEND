@@ -95,8 +95,6 @@ const findAllVideos = async (page, limit, options) => {
         });
     }
 
-    console.log(pipeline);
-
     // Match documents based on the query
     if (options?.query) {
         pipeline.push({
