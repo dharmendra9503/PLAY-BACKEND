@@ -6,6 +6,10 @@ const videoSchema = new Schema({
         type: String,    //cloudinary url
         required: true,
     },
+    playbackURL: {
+        type: String,    //cloudinary url
+        required: true
+    },
     thumbnail: {
         type: String,   //cloudinary url
         required: true
