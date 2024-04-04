@@ -34,7 +34,7 @@ const errorHandler = (err, req, res, next) => {
 
     logger.error(`${error.message}`);
 
-    removeUnusedMulterImageFilesOnError(req);
+    // removeUnusedMulterImageFilesOnError(req);
     // Send error response
     return res.status(error.statusCode).json(response);
 };

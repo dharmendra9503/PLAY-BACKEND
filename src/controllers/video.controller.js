@@ -35,9 +35,9 @@ const publishAVideo = asyncHandler(async (req, res) => {
         const { title, description } = req.body
 
         //Check title and description are not empty strings or undefined or null or empty strings after trimming spaces
-        if (!title || !description || title.trim() === "" || description.trim() === "") {
-            throw new ApiError(400, "Title and description are required")
-        }
+        // if (!title || !description || title.trim() === "" || description.trim() === "") {
+        //     throw new ApiError(400, "Title and description are required")
+        // }
 
         //Check if videoFile and thumbnail are uploaded and are valid files
         if (!req.files || !req.files?.video || !req.files?.thumbnail) {
@@ -154,7 +154,7 @@ const getVideoById = asyncHandler(async (req, res) => {
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
-    
+
     const video = await findVideoById(videoId);
     if (!video) {
         throw new ApiError(404, "Video not found")

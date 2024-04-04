@@ -9,7 +9,8 @@ import {
     findUserById,
     findAndUpdateUser,
     findUserChannelProfile,
-    findUserWatchHistory
+    findUserWatchHistory,
+    findUserWithAllData
 } from "../services/user.service.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -31,14 +32,6 @@ const registerUser = asyncHandler(async (req, res) => {
     try {
         // get user details from request
         const { fullName, username, email, password } = req.body;
-
-        // validation - not empty
-        if (
-            !fullName || !username || !email || !password ||
-            [fullName, username, email, password].some((field) => field?.trim() === "")
-        ) {
-            throw new ApiError(400, "All fields are required");
-        }
 
         // check if user already exists: username, email
         const existedUser = await findUser(username, email);
@@ -227,11 +220,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const changeCurrentPassword = asyncHandler(async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body;
-        if (!oldPassword || !newPassword) {
-            throw new ApiError(400, "All fields are required");
-        }
+
         // check if old password is correct
-        const user = await findUserById(req.user?._id);
+        const user = await findUserWithAllData(req.user?._id);
         const isPasswordValid = await user.isPasswordCorrect(oldPassword);
         if (!isPasswordValid) {
             throw new ApiError(401, "Invalid old password");
@@ -256,22 +247,28 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
     try {
-        // get user details from request
-        const { fullName, email } = req.body;
-        if (!fullName || !email) {
-            throw new ApiError(400, "All fields are required");
+        const { fullName, email, username } = req.body;
+        const user = await findUserById(req.user._id);
+        if (!user) {
+            throw new ApiError(404, "User does not exist");
         }
-        // update user details in db
-        const user = await findAndUpdateUser(
-            req.user._id,
-            {
-                $set: {
-                    fullName,
-                    email
-                }
-            },
-            true // this will return updated document with refresh token
-        );
+
+        if (email || username) {
+            const existedUser = await findUser(username, email);
+            if (existedUser.length && (existedUser.length > 1 || existedUser[0]._id.toString() !== user._id.toString())) {
+                throw new ApiError(409, "User with email or username already exists");
+            }
+            if (email) {
+                user.email = email;
+            }
+            if (username) {
+                user.username = username;
+            }
+        }
+        if (fullName) {
+            user.fullName = fullName;
+        }
+        await user.save({ validateBeforeSave: false });
         return res
             .status(200)
             .json(new ApiResponse(200, user, "Account details updated successfully"));

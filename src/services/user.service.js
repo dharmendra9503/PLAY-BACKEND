@@ -1,20 +1,25 @@
 import { User } from "../models/user.model.js";
 
 const findUser = async (username, email) => {
-    const data = await User.findOne({
+    const data = await User.find({
         $or: [{ username }, { email }]
     });
     return data;
 }
 
-const findUserById = async (id, refreshToken = false) => {
+const findUserById = async (id, refreshToken = false, password = false) => {
     if (!refreshToken) {
-        const data = await User.findById(id).select("-password -refreshToken");
+        const data = await User.findById(id).select("-password -refreshToken -__v");
         return data;
     } else {
-        const data = await User.findById(id).select("-password");
+        const data = await User.findById(id).select("-password -__v");
         return data;
     }
+}
+
+const findUserWithAllData = async (id) => {
+    const data = await User.findById(id).select("-__v");
+    return data;
 }
 
 const findAndUpdateUser = async (id, updateData, refreshToken = false) => {
@@ -151,5 +156,6 @@ export {
     findUserById,
     findAndUpdateUser,
     findUserChannelProfile,
-    findUserWatchHistory
+    findUserWatchHistory,
+    findUserWithAllData
 }
