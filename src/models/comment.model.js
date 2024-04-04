@@ -8,13 +8,11 @@ const commentSchema = new Schema({
     },
     video: {
         type: Schema.Types.ObjectId,
-        ref: "Video",
-        required: true
+        ref: "Video"
     },
     owner: {
         type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true
+        ref: "User"
     }
 }, { timestamps: true });
 
