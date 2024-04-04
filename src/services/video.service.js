@@ -8,8 +8,18 @@ const publishVideoService = async (videoDetails) => {
     return savedVideo;
 }
 
-const findVideoById = async (videoId) => {
+const findVideo = async (videoId) => {
     const video = await Video.find({ _id: videoId, isPublished: true }).select("-__v");
+    return video;
+}
+
+const findVideoById = async (videoId) => {
+    const video = await Video.findById(videoId).select("-__v");
+    return video;
+}
+
+const deleteVideoById = async (videoId) => {
+    const video = await Video.findByIdAndDelete(videoId);
     return video;
 }
 
@@ -144,5 +154,7 @@ const findAllVideos = async (page, limit, options) => {
 export {
     publishVideoService,
     findVideoById,
-    findAllVideos
+    findAllVideos,
+    findVideo,
+    deleteVideoById
 }

@@ -3,7 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { publishVideoService, findAllVideos } from "../services/video.service.js";
-import { findVideoById } from "../services/video.service.js";
+import { findVideoById, findVideo, deleteVideoById } from "../services/video.service.js";
 import axios from 'axios';
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -105,6 +105,8 @@ const publishAVideoV2 = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid thumbnail file")
     }
 
+    //TO-DO: Video store using HLS and DASH formats for adaptive streaming using ffmpeg
+
     return res.status(201).json(new ApiResponse(201, savedVideo, 'Video published successfully'));
 });
 
@@ -113,8 +115,8 @@ const getVideoById = asyncHandler(async (req, res) => {
     // const videoObjectId = new mongoose.Types.ObjectId(videoId);
 
     //get video details by videoId from database if video is published
-    const video = await findVideoById(videoId);
-    if (!video) {
+    const video = await findVideo(videoId);
+    if (!video.length) {
         throw new ApiError(404, "Video not found")
     }
 
@@ -142,7 +144,7 @@ const getVideoById = asyncHandler(async (req, res) => {
     // console.log(videoUrl);
 
     try {
-        const response = await axios.get(video[0].playbackURL, { responseType: 'stream' });
+        const response = await axios.get(video[0]?.playbackURL, { responseType: 'stream' });
         response.data.pipe(res);
     } catch (error) {
         console.error('Error streaming video:', error);
@@ -151,17 +153,56 @@ const getVideoById = asyncHandler(async (req, res) => {
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
+    const { videoId } = req.params;
+    
+    const video = await findVideoById(videoId);
+    if (!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    const { title, description } = req.body;
+    if (title) {
+        video.title = title;
+    }
+    if (description) {
+        video.description = description;
+    }
+    if (req.file) {
+        const thumbnailLocalPath = req.file?.path;
+        const thumbnail = await uploadOnCloudinary(thumbnailLocalPath, req.file?.fieldname);
+        if (!thumbnail.secure_url) {
+            throw new ApiError(400, "Error while uploading avatar on cloudinary");
+        }
+        video.thumbnail = thumbnail.secure_url;
+    }
+    await video.save({ validateBeforeSave: false });
+
+    return res.status(200).json(new ApiResponse(200, video, "Video updated successfully"));
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: delete video
+
+    const video = await deleteVideoById(videoId);
+    if (!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    return res.status(200).json(new ApiResponse(200, video, "Video deleted successfully"));
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
+    const { videoId } = req.params;
+
+    const video = await findVideoById(videoId);
+    if (!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    video.isPublished = !video.isPublished;
+    await video.save({ validateBeforeSave: false });
+
+    return res.status(200).json(new ApiResponse(200, video, "Video publish status updated successfully"));
 })
 
 export {
