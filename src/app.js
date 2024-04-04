@@ -84,11 +84,13 @@ app.use(morganMiddleware);
 //routes import
 import userRouter from './routes/user.routes.js';
 import videoRouter from "./routes/video.routes.js";
+import tweetRouter from "./routes/tweet.routes.js";
 import videoRouterV2 from "./routes/videoV2.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/videos", videoRouter);
+app.use("/api/v1/tweets", tweetRouter)
 
 //version 2 routes
 app.use("/api/v2/videos", videoRouterV2);
