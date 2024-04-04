@@ -6,6 +6,8 @@ import {
     updateTweet,
 } from "../controllers/tweet.controller.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
+import { createTweetValidator } from '../validators/tweet.validators.js';
+import { validate } from '../validators/validate.js';
 
 const router = Router();
 
@@ -13,7 +15,7 @@ router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
 router
     .route("/")
-    .post(createTweet);
+    .post(createTweetValidator(), validate, createTweet);
 
 router
     .route("/user/:userId")
@@ -21,7 +23,7 @@ router
 
 router
     .route("/:tweetId")
-    .patch(updateTweet)
+    .patch(createTweetValidator(), validate, updateTweet)
     .delete(deleteTweet);
 
 export default router;
