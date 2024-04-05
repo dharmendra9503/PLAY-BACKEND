@@ -6,7 +6,10 @@ import {
     updateComment,
 } from "../controllers/comment.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { createCommentValidator } from '../validators/comment.validators.js';
+import {
+    createCommentValidator,
+    updateCommentValidator
+} from '../validators/comment.validators.js';
 import { validate } from '../validators/validate.js';
 
 const router = Router();
@@ -19,6 +22,6 @@ router.route("/:videoId")
 
 router.route("/c/:commentId")
     .delete(deleteComment) // To delete a comment
-    .patch(createCommentValidator(), validate, updateComment); // To update a comment
+    .patch(updateCommentValidator(), validate, updateComment); // To update a comment
 
 export default router;

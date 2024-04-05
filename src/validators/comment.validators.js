@@ -1,4 +1,4 @@
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 
 const createCommentValidator = () => {
     return [
@@ -11,6 +11,24 @@ const createCommentValidator = () => {
     ];
 };
 
+const updateCommentValidator = () => {
+    return [
+        body("content")
+            .trim()
+            .notEmpty()
+            .withMessage("content is required")
+            .isLength({ min: 1, max: 1000 })
+            .withMessage("content must be between 1 and 1000 characters"),
+        param("commentId")
+            .trim()
+            .notEmpty()
+            .withMessage("commentId is required")
+            .isMongoId()
+            .withMessage("commentId is invalid")
+    ];
+};
+
 export {
-    createCommentValidator
+    createCommentValidator,
+    updateCommentValidator
 };
