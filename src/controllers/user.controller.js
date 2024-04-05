@@ -339,14 +339,12 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 const getUserChannelProfile = asyncHandler(async (req, res) => {
     try {
         const { username } = req.params;
-        if (!username?.trim()) {
-            throw new ApiError(400, "Username is required");
-        }
+
         const channel = await findUserChannelProfile(username, req.user?._id);
         if (!channel?.length) {
             throw new ApiError(404, "channel does not exists");
         }
-        console.log(channel);
+
         return res
             .status(200)
             .json(

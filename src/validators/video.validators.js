@@ -13,6 +13,18 @@ const videoPublishValidator = () => {
     ];
 };
 
+const videoIdValidator = () => {
+    return [
+        param("videoId")
+            .trim()
+            .notEmpty()
+            .withMessage("Video ID is required")
+            .isMongoId()
+            .withMessage("Invalid video ID") 
+    ];
+};
+
 export {
-    videoPublishValidator
+    videoPublishValidator,
+    videoIdValidator
 };

@@ -16,6 +16,7 @@ import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
     userChangeCurrentPasswordValidator,
+    userChannelProfileValidator,
     userLoginValidator,
     userRegisterValidator,
     userUpdateAccountDetailsValidator
@@ -51,7 +52,7 @@ router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/update-account").patch(verifyJWT, userUpdateAccountDetailsValidator(), validate, updateAccountDetails);
 router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 router.route("/update-cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
-router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
+router.route("/c/:username").get(verifyJWT, userChannelProfileValidator(), validate, getUserChannelProfile);
 router.route("/history").get(verifyJWT, getWatchHistory);
 
 export default router;

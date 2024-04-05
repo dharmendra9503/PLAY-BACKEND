@@ -9,7 +9,10 @@ import {
 } from "../controllers/video.controller.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 import { upload } from "../middlewares/multer.middleware.js"
-import { videoPublishValidator } from '../validators/video.validators.js';
+import {
+    videoIdValidator,
+    videoPublishValidator
+} from '../validators/video.validators.js';
 import { validate } from "../validators/validate.js";
 
 const router = Router();
@@ -37,10 +40,11 @@ router
 
 router
     .route("/:videoId")
-    .get(getVideoById)
-    .delete(deleteVideo)
-    .patch(upload.single("thumbnail"), updateVideo);
+    .get(videoIdValidator(), validate, getVideoById)
+    .delete(videoIdValidator(), validate, deleteVideo)
+    .patch(upload.single("thumbnail"), videoIdValidator(), validate, updateVideo);
 
-router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
+router.route("/toggle/publish/:videoId")
+    .patch(videoIdValidator(), validate, togglePublishStatus);
 
 export default router

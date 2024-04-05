@@ -59,11 +59,21 @@ const userUpdateAccountDetailsValidator = () => {
         body("fullName")
             .optional(),
     ];
-}
+};
+
+const userChannelProfileValidator = () => {
+    return [
+        param("username")
+            .trim()
+            .notEmpty()
+            .withMessage("Username is required")
+    ];
+};
 
 export {
     userRegisterValidator,
     userLoginValidator,
     userChangeCurrentPasswordValidator,
     userUpdateAccountDetailsValidator,
+    userChannelProfileValidator
 };
