@@ -45,8 +45,20 @@ const deleteCommentValidator = () => {
     ];
 };
 
+const getVideoCommentsValidator = () => {
+    return [
+        param("videoId")
+            .trim()
+            .notEmpty()
+            .withMessage("videoId is required")
+            .isMongoId()
+            .withMessage("videoId is invalid")
+    ];
+};
+
 export {
     createCommentValidator,
     updateCommentValidator,
-    deleteCommentValidator
+    deleteCommentValidator,
+    getVideoCommentsValidator
 };
