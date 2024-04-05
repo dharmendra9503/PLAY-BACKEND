@@ -6,7 +6,12 @@ import {
     updateTweet,
 } from "../controllers/tweet.controller.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
-import { createTweetValidator } from '../validators/tweet.validators.js';
+import {
+    createTweetValidator,
+    deleteTweetValidator,
+    getUserTweetsValidator,
+    updateTweetValidator
+} from '../validators/tweet.validators.js';
 import { validate } from '../validators/validate.js';
 
 const router = Router();
@@ -19,11 +24,11 @@ router
 
 router
     .route("/user/:userId")
-    .get(getUserTweets);
+    .get(getUserTweetsValidator(), validate, getUserTweets);
 
 router
     .route("/:tweetId")
-    .patch(createTweetValidator(), validate, updateTweet)
-    .delete(deleteTweet);
+    .patch(updateTweetValidator(), validate, updateTweet)
+    .delete(deleteTweetValidator(), validate, deleteTweet);
 
 export default router;
