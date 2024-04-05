@@ -7,6 +7,13 @@ const findUser = async (username, email) => {
     return data;
 }
 
+const findUserOne = async (username, email) => {
+    const data = await User.findOne({
+        $or: [{ username }, { email }]
+    });
+    return data;
+}
+
 const findUserById = async (id, refreshToken = false, password = false) => {
     if (!refreshToken) {
         const data = await User.findById(id).select("-password -refreshToken -__v");
@@ -153,6 +160,7 @@ const findUserWatchHistory = async (id) => {
 export {
     createUser,
     findUser,
+    findUserOne,
     findUserById,
     findAndUpdateUser,
     findUserChannelProfile,

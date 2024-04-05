@@ -10,7 +10,8 @@ import {
     findAndUpdateUser,
     findUserChannelProfile,
     findUserWatchHistory,
-    findUserWithAllData
+    findUserWithAllData,
+    findUserOne
 } from "../services/user.service.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -34,7 +35,7 @@ const registerUser = asyncHandler(async (req, res) => {
         const { fullName, username, email, password } = req.body;
 
         // check if user already exists: username, email
-        const existedUser = await findUser(username, email);
+        const existedUser = await findUserOne(username, email);
         if (existedUser) {
             throw new ApiError(409, "User with email or username already exists");
         }
@@ -100,7 +101,7 @@ const loginUser = asyncHandler(async (req, res) => {
         }
 
         // check if user exists email
-        const user = await findUser(username, email);
+        const user = await findUserOne(username, email);
         if (!user) {
             throw new ApiError(404, "User does not exist");
         }
@@ -254,7 +255,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         }
 
         if (email || username) {
-            const existedUser = await findUser(username, email);
+            const existedUser = await findUserOne(username, email);
             if (existedUser.length && (existedUser.length > 1 || existedUser[0]._id.toString() !== user._id.toString())) {
                 throw new ApiError(409, "User with email or username already exists");
             }
