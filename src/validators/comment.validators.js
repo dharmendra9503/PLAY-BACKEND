@@ -7,7 +7,13 @@ const createCommentValidator = () => {
             .notEmpty()
             .withMessage("content is required")
             .isLength({ min: 1, max: 1000 })
-            .withMessage("content must be between 1 and 1000 characters")
+            .withMessage("content must be between 1 and 1000 characters"),
+        param("videoId")
+            .trim()
+            .notEmpty()
+            .withMessage("videoId is required")
+            .isMongoId()
+            .withMessage("videoId is invalid")
     ];
 };
 
