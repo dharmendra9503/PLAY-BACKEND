@@ -34,7 +34,19 @@ const updateCommentValidator = () => {
     ];
 };
 
+const deleteCommentValidator = () => {
+    return [
+        param("commentId")
+            .trim()
+            .notEmpty()
+            .withMessage("commentId is required")
+            .isMongoId()
+            .withMessage("commentId is invalid")
+    ];
+};
+
 export {
     createCommentValidator,
-    updateCommentValidator
+    updateCommentValidator,
+    deleteCommentValidator
 };

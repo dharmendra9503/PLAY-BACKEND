@@ -8,6 +8,7 @@ import {
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
     createCommentValidator,
+    deleteCommentValidator,
     updateCommentValidator
 } from '../validators/comment.validators.js';
 import { validate } from '../validators/validate.js';
@@ -21,7 +22,7 @@ router.route("/:videoId")
     .post(createCommentValidator(), validate, addComment);     // To add a new comment to a video
 
 router.route("/c/:commentId")
-    .delete(deleteComment) // To delete a comment
+    .delete(deleteCommentValidator(), validate, deleteComment) // To delete a comment
     .patch(updateCommentValidator(), validate, updateComment); // To update a comment
 
 export default router;
