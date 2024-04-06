@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Comment } from "../models/comment.model.js";
-import { findVideoById } from "../services/video.service.js";
+import { findVideo } from "../services/video.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
@@ -11,8 +11,8 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
     const { page, limit } = req.query;
 
-    const video = await findVideoById(videoId);
-    if (!video) {
+    const video = await findVideo(videoId);
+    if (!video.length) {
         throw new ApiError(404, "Video not found");
     }
 
@@ -73,8 +73,8 @@ const addComment = asyncHandler(async (req, res) => {
     const { content } = req.body;
     const { videoId } = req.params;
 
-    const video = await findVideoById(videoId);
-    if (!video) {
+    const video = await findVideo(videoId);
+    if (!video.length) {
         throw new ApiError(404, "Video not found");
     }
 
