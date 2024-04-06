@@ -1,6 +1,6 @@
-const { body, param } = require("express-validator");
+import { body, param } from "express-validator";
 
-export const toggleVideoLikeValidator = () => {
+const toggleVideoLikeValidator = () => {
     return [
         param("videoId")
             .trim()
@@ -11,7 +11,7 @@ export const toggleVideoLikeValidator = () => {
     ];
 };
 
-export const toggleCommentLikeValidator = () => {
+const toggleCommentLikeValidator = () => {
     return [
         param("commentId")
             .trim()
@@ -22,7 +22,7 @@ export const toggleCommentLikeValidator = () => {
     ];
 };
 
-export const toggleTweetLikeValidator = () => {
+const toggleTweetLikeValidator = () => {
     return [
         param("tweetId")
             .trim()
