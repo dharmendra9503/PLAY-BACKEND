@@ -9,16 +9,19 @@ import {
     updatePlaylist,
 } from "../controllers/playlist.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { createPlaylistValidator, updatePlaylistValidator } from '../validators/playlist.validator.js';
+import { validate } from '../validators/validate.js';
 
 const router = Router();
 
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
-router.route("/").post(createPlaylist);
+router.route("/")
+    .post(createPlaylistValidator(), validate, createPlaylist);
 
 router.route("/:playlistId")
     .get(getPlaylistById)
-    .patch(updatePlaylist)
+    .patch(updatePlaylistValidator(), validate, updatePlaylist)
     .delete(deletePlaylist);
 
 router.route("/add/:videoId/:playlistId")
