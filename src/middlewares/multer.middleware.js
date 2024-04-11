@@ -1,9 +1,18 @@
 import multer from 'multer';
+import fs from 'fs';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // This storage needs public/images folder in the root directory
-        // Else it will throw an error saying cannot find path public/images
+        /*
+            The `fs.existsSync()` method is used to synchronously test whether or not the given path exists.
+            If path not found, it will create the path.
+        */
+        if (!fs.existsSync("./public/temp")) {
+            fs.mkdirSync("./public/temp", { recursive: true });
+        }
+
+        // This storage needs public/temp folder in the root directory
+        // Else it will throw an error saying cannot find path public/temp
         cb(null, "./public/temp")
     },
     filename: function (req, file, cb) {
