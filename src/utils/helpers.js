@@ -49,7 +49,7 @@ export const getMongoosePaginationOptions = ({
     customLabels,
 }) => {
     return {
-        page: Math.max(page, 1),
+        page: Math.max(isNaN(parseInt(page)) ? 1 : page, 1),
         limit: Math.max(limit, 1),
         pagination: true,
         customLabels: {
