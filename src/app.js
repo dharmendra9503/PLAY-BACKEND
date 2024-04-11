@@ -8,6 +8,9 @@ import requestIp from "request-ip";
 import { rateLimit } from "express-rate-limit";
 import morganMiddleware from "./logger/morgan.logger.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
+import YAML from "yaml";
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
 
 /*
     The import.meta object is a new feature in ES Modules that allows you to access meta information about the current module.
@@ -17,6 +20,9 @@ import { errorHandler } from "./middlewares/error.middleware.js";
 */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const file = fs.readFileSync(path.resolve(__dirname, "./swagger.yaml"), "utf8");
+const swaggerDocument = YAML.parse(file);
 
 const app = express();
 const httpServer = createServer(app);
@@ -102,6 +108,19 @@ app.use("/api/v1/playlist", playlistRouter)
 
 //version 2 routes
 app.use("/api/v2/videos", videoRouterV2);
+
+// * API DOCS
+// ? Keeping swagger code at the end so that we can load swagger on "/" route
+app.use(
+    "/",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocument, {
+        swaggerOptions: {
+            docExpansion: "none", // keep all the sections collapsed by default
+        },
+        customSiteTitle: "PlayAPI docs",
+    })
+);
 
 // common error handling middleware
 app.use(errorHandler);

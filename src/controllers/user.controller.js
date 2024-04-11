@@ -5,7 +5,6 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import {
     createUser,
-    findUser,
     findUserById,
     findAndUpdateUser,
     findUserChannelProfile,
@@ -84,7 +83,7 @@ const registerUser = asyncHandler(async (req, res) => {
         // return res
         return res
             .status(201)
-            .json(new ApiResponse(200, createdUser, "User registered Successfully"));
+            .json(new ApiResponse(201, createdUser, "User registered Successfully"));
     } catch (error) {
         throw new ApiError(error?.statusCode || 500, error?.message || "Something went wrong while registering the user");
     }

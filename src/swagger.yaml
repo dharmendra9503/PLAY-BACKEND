@@ -1,0 +1,263 @@
+openapi: 3.0.0
+info:
+  title: Play API
+  description: >-
+    ## Play APIs
+
+    The **Play API** project provides a set of APIs for building applications similar to YouTube. It offers functionalities for managing videos, user authentication, user interactions, and more.
+
+    Key features of the Play API project include:
+
+    1. **Video Management:** Easily upload, retrieve, update, and delete videos.
+
+
+    2. **User Authentication:** Secure user authentication and authorization mechanisms.
+
+
+    3. **User Interaction:** Allow users to like, comment, and share videos, as well as subscribe to channels.
+
+
+    4. **Search and Discovery:** Provide powerful search capabilities for discovering videos based on various criteria.
+
+
+    5. **Analytics and Insights:** Access comprehensive analytics and insights to track video performance and user engagement.
+
+    The Play API project is designed to streamline the development of video-centric applications and empower developers to create immersive and engaging experiences for their users.
+
+    ## 🏁 Installation
+
+    Follow [these](https://github.com/dharmendra9503/PLAY-BACKEND) instructions below to install and set up the Play API project.
+
+    ## 📚 Documentation
+
+    Explore the full documentation of the Play API to understand how to use each endpoint and integrate it into your application.
+
+    ## 🐛 Reporting Issues
+
+    If you find API issues or bugs when testing, please create an [issue](https://github.com/dharmendra9503/PLAY-BACKEND/issues/new).
+  version: 1.0.0
+  contact: {}
+servers:
+  - url: "http://localhost:8080/api/v1"
+paths:
+  /users/register:
+    post:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+      summary: Register user
+      description: >-
+        The API endpoint allows users to register or signup to create their
+        accounts.
+      operationId: registerUser
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+               - fullName
+               - username
+               - email
+               - password
+               - avatar
+              properties:
+                fullName:
+                  type: string
+                  format: text
+                  example: John Doe
+                username:
+                  type: string
+                  format: text
+                  example: doejohn
+                email:
+                  type: string
+                  format: text
+                  example: user.user@gmail.com
+                password:
+                  type: string
+                  format: password
+                  example: test@123
+                avatar:
+                  type: string
+                  format: binary
+                coverImage:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Register user
+          headers:
+            Access-Control-Allow-Credentials:
+              schema:
+                type: string
+                example: 'true'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: string
+                example: '500'
+            Date:
+              schema:
+                type: string
+                example: Fri, 30 Jun 2023 06:44:09 GMT
+            ETag:
+              schema:
+                type: string
+                example: W/"1f4-1q38Sbu25p0UVmeYQmrEv2VrgPg"
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            RateLimit-Policy:
+              schema:
+                type: string
+                example: 500;w=900
+            RateLimit-Limit:
+              schema:
+                type: string
+                example: '500'
+            RateLimit-Remaining:
+              schema:
+                type: string
+                example: '495'
+            RateLimit-Reset:
+              schema:
+                type: string
+                example: '772'
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                            example: 649e795264e7dba29b726936
+                          username:
+                            type: string
+                            example: "johndoe52"
+                          email:
+                            type: string
+                            example: "johndoe@gmail.com"
+                          fullName:
+                            type: string
+                            example: "John Doe"
+                          avatar:
+                            type: string
+                            example: "https://res.cloudinary.com/play-backend/image/upload/v1712851524/avatar/m8iwnhugqbsrsum6vhwb.jpg"
+                          coverImage:
+                            type: string
+                            example: "https://res.cloudinary.com/play-backend/image/upload/v1712851524/avatar/m8iwnhugqbsrsum6vhwb.jpg"
+                          watchHistory:
+                            type: array
+                            items:
+                              type: string
+                            example: []
+                          createdAt:
+                            type: string
+                            example: '2023-06-30T06:42:26.163Z'
+                          updatedAt:
+                            type: string
+                            example: '2023-06-30T06:42:26.247Z'
+                  message:
+                    type: string
+                    example: >-
+                      User registered Successfully.
+                  statusCode:
+                    type: number
+                    example: 201
+                  success:
+                    type: boolean
+                    example: true
+              examples:
+                Register user:
+                  value:
+                    statusCode: 201
+                    data:
+                      _id: 649e795264e7dba29b726936
+                      username: "johndoe52"
+                      email: "johndoe@gmail.com"
+                      fullName: "John Doe"
+                      avatar: "https://res.cloudinary.com/play-backend/image/upload/v1712851524/avatar/m8iwnhugqbsrsum6vhwb.jpg"
+                      coverImage: "https://res.cloudinary.com/play-backend/image/upload/v1712851524/avatar/m8iwnhugqbsrsum6vhwb.jpg"
+                      watchHistory: []
+                      createdAt: '2023-06-30T06:42:26.163Z'
+                      updatedAt: '2023-06-30T06:42:26.247Z'
+                    message: >-
+                      User registered Successfully.
+                    success: true
+  /users/login:
+    post:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+  /users/logout:
+    post:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+  /users/change-password:
+    post:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+  /users/refresh-token:
+    post:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+  /users/current-user:
+    get:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+  /users/c/:username:
+    get:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+  /users/history:
+    get:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+  /users/update-account:
+    patch:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+  /users/update-avatar:
+    patch:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+  /users/update-cover-image:
+    patch:
+      tags:
+        
+        - 🔐 Authentication/User-Operations
+
+tags:
+  - name: 🔐 Authentication/User-Operations
+    description: >-
+      This section encompasses all the APIs related to user authentication.                
