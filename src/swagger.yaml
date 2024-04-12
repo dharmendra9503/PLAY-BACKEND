@@ -155,7 +155,7 @@ paths:
                             example: 649e795264e7dba29b726936
                           username:
                             type: string
-                            example: "johndoe52"
+                            example: "doejohn"
                           email:
                             type: string
                             example: "johndoe@gmail.com"
@@ -195,7 +195,7 @@ paths:
                     statusCode: 201
                     data:
                       _id: 649e795264e7dba29b726936
-                      username: "johndoe52"
+                      username: "johndoe"
                       email: "johndoe@gmail.com"
                       fullName: "John Doe"
                       avatar: "https://res.cloudinary.com/play-backend/image/upload/v1712851524/avatar/m8iwnhugqbsrsum6vhwb.jpg"
@@ -211,11 +211,293 @@ paths:
       tags:
         
         - 🔐 Authentication/User-Operations
+      summary: Login user
+      description: >-
+        The API endpoint allows users to log into the application securely and
+        also returns an access token.
+
+
+        When accessing this endpoint with valid login credentials, users will
+        receive an access token in the response.
+
+
+        Additionally, the API endpoint securely sets the access token within the
+        browser/client httpOnly cookies for future authentication and
+        authorization purposes.
+
+
+        This functionality ensures a secure and efficient login process for
+        users, providing them with an access token that can be used to
+        authenticate subsequent API requests.
+
+
+        By securely storing the access token in browser cookies, the endpoint
+        enables automatic inclusion of the access token in future API requests,
+        eliminating the need for users to manually manage and provide the token
+        with each request.
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: doejohn
+                password:
+                  type: string
+                  example: test@123
+            example:
+              username: doejohn
+              password: test@123
+      responses:
+        '200':
+          description: Register user
+          headers:
+            Access-Control-Allow-Credentials:
+              schema:
+                type: string
+                example: 'true'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: string
+                example: '500'
+            Date:
+              schema:
+                type: string
+                example: Fri, 30 Jun 2023 06:44:09 GMT
+            ETag:
+              schema:
+                type: string
+                example: W/"1f4-1q38Sbu25p0UVmeYQmrEv2VrgPg"
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            RateLimit-Policy:
+              schema:
+                type: string
+                example: 500;w=900
+            RateLimit-Limit:
+              schema:
+                type: string
+                example: '500'
+            RateLimit-Remaining:
+              schema:
+                type: string
+                example: '495'
+            RateLimit-Reset:
+              schema:
+                type: string
+                example: '772'
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                            example: 649e795264e7dba29b726936
+                          username:
+                            type: string
+                            example: doejohn
+                          email:
+                            type: string
+                            example: user.email@domain.com
+                          fullName:
+                            type: string
+                            example: John Doe
+                          avatar:
+                            type: string
+                            example: http://res.cloudinary.com/play-backend/image/upload/v1708798972/oe1hkdlj1bjgku6edyxf.png
+                          coverImage:
+                            type: string
+                            example: http://res.cloudinary.com/play-backend/image/upload/v1708798972/oe1hkdlj1bjgku6edyxf.png
+                          watchHistory:
+                            type: array
+                            items:
+                              type: string
+                            example: []
+                          createdAt:
+                            type: string
+                            example: '2023-06-30T06:42:26.163Z'
+                          updatedAt:
+                            type: string
+                            example: '2023-06-30T06:44:29.831Z'
+                      accessToken:
+                        type: string
+                        example: >-
+                          eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDllNzk1MjY0ZTdkYmEyOWI3MjY5MzYiLCJlbWFpbCI6IndhamUuc2h1YmhhbTExMUBnbWFpbC5jb20
+                          iLCJ1c2VybmFtZSI6IndhamVzaHViaGFtIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNjg4MTA3NDY5LCJleHAiOjE2ODgxOTM4Njl9.40qfVrWi8x8fGBRB9JBVCVsdMY
+                          vlwzjIRpffz5z7DK4
+                      refreshToken:
+                        type: string
+                        example: >-
+                          eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDllNzk1MjY0ZTdkYmEyOWI3MjY5MzYiLCJpYXQiOjE2ODgxMDc0NjksImV4cCI6MTY4ODk3MTQ2OX0
+                          .7or55Coj0K_UY4YpzYzkNR9hcOIhusxk9FRz7eMV8Ho
+                  message:
+                    type: string
+                    example: User logged In successfully
+                  success:
+                    type: boolean
+                    example: true
+              examples:
+                Login user:
+                  value:
+                    statusCode: 200
+                    data:
+                      user:
+                        _id: 649e795264e7dba29b726936
+                        username: doejohn
+                        email: user.email@domain.com
+                        fullName: John Doe
+                        avatar: http://res.cloudinary.com/play-backend/image/upload/v1708798972/oe1hkdlj1bjgku6edyxf.png
+                        coverImage: http://res.cloudinary.com/play-backend/image/upload/v1708798972/oe1hkdlj1bjgku6edyxf.png
+                        watchHistory: []
+                        createdAt: '2023-06-30T06:42:26.163Z'
+                        updatedAt: '2023-06-30T06:44:29.831Z'
+                      accessToken: >-
+                        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDllNzk1MjY0ZTdkYmEyOWI3MjY5MzYiLCJlbWFpbCI6IndhamUuc2h1YmhhbTExMUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IndhamVzaHViaGFtIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNjg4MTA3NDY5LCJleHAiOjE2ODgxOTM4Njl9.40qfVrWi8x8fGBRB9JBVCVsdMYvlwzjIRpffz5z7DK4
+                      refreshToken: >-
+                        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDllNzk1MjY0ZTdkYmEyOWI3MjY5MzYiLCJpYXQiOjE2ODgxMDc0NjksImV4cCI6MTY4ODk3MTQ2OX0.7or55Coj0K_UY4YpzYzkNR9hcOIhusxk9FRz7eMV8Ho
+                    message: User logged In successfully
+                    success: true
   /users/logout:
     post:
       tags:
         
         - 🔐 Authentication/User-Operations
+      summary: Logout user
+      description: >-
+        The API endpoint is responsible for logging out users from the
+        application and destroying the access token cookies stored on the
+        client-side.
+
+
+        When accessing this endpoint, it triggers the logout process, revoking
+        the user's authentication and terminating their active session.
+
+
+        Additionally, it ensures that any access token cookies associated with
+        the user's session are removed from the client's browser, effectively
+        logging them out from the application.
+      operationId: logoutUser
+      responses:
+        '200':
+          description: Logout user
+          headers:
+            Access-Control-Allow-Credentials:
+              schema:
+                type: string
+                example: 'true'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: string
+                example: '71'
+            Date:
+              schema:
+                type: string
+                example: Sun, 04 Jun 2023 14:53:17 GMT
+            ETag:
+              schema:
+                type: string
+                example: W/"47-As20QlSbGGTq515zdhzWHPjwWhg"
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            RateLimit-Policy:
+              schema:
+                type: string
+                example: 500;w=900
+            RateLimit-Limit:
+              schema:
+                type: string
+                example: '500'
+            RateLimit-Remaining:
+              schema:
+                type: string
+                example: '494'
+            RateLimit-Reset:
+              schema:
+                type: string
+                example: '648'
+            Set-Cookie:
+              schema:
+                type: string
+                example: >-
+                  refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT;
+                  HttpOnly
+            X-Powered-By:
+              schema:
+                type: string
+                example: Express
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 200
+                  data:
+                    type: object
+                    properties: {}
+                  message:
+                    type: string
+                    example: User logged out
+                  success:
+                    type: boolean
+                    example: true
+              examples:
+                Logout user:
+                  value:
+                    statusCode: 200
+                    data: {}
+                    message: User logged out
+                    success: true
   /users/change-password:
     post:
       tags:
